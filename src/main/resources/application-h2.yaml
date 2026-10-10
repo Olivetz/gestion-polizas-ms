@@ -1,0 +1,35 @@
+# ======================================================================================
+# Perfil H2 — base de datos en memoria (perfil por defecto)
+# No requiere instalación, usuario ni contraseña. Ideal para ejecutar y probar en local.
+# El esquema y los datos de ejemplo se cargan automáticamente al arrancar
+# (schema-h2.sql y data-h2.sql en src/main/resources).
+# ======================================================================================
+spring:
+  datasource:
+    url: jdbc:h2:mem:gestion_polizas;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      # Las tablas las crea schema-h2.sql; JPA no modifica el esquema.
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
+      data-locations: classpath:data-h2.sql
+
+  # Consola web de H2 para inspeccionar los datos en el navegador (solo desarrollo).
+  # Disponible en: http://localhost:8080/h2-console  (JDBC URL del campo 'url' de arriba)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console

@@ -1,0 +1,296 @@
+{
+  "info": {
+    "name": "gestion-polizas-ms",
+    "description": "Colección de pruebas para el microservicio de Gestión de Pólizas (Módulo 2 - Prueba Técnica).\n\nIncluye todos los endpoints y casos de prueba (éxito y error).\n\nURL base: http://localhost:8080/api/v1\nHeader obligatorio: api-key: 123456\n\nDatos de ejemplo precargados (perfil H2):\n- Póliza 1: INDIVIDUAL, ACTIVA (1 riesgo)\n- Póliza 2: COLECTIVA, ACTIVA (2 riesgos)\n- Póliza 3: COLECTIVA, CANCELADA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "apiKey",
+      "value": "123456",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Pólizas",
+      "item": [
+        {
+          "name": "Listar pólizas (todas)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas"]
+            },
+            "description": "Lista todas las pólizas sin filtros."
+          }
+        },
+        {
+          "name": "Listar pólizas (filtro tipo + estado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas?tipo=COLECTIVA&estado=ACTIVA",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas"],
+              "query": [
+                { "key": "tipo", "value": "COLECTIVA" },
+                { "key": "estado", "value": "ACTIVA" }
+              ]
+            },
+            "description": "Lista pólizas filtrando por tipo (INDIVIDUAL/COLECTIVA) y estado (ACTIVA/RENOVADA/CANCELADA)."
+          }
+        },
+        {
+          "name": "Consultar riesgos de una póliza",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/2/riesgos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "2", "riesgos"]
+            },
+            "description": "Lista los riesgos de la póliza 2 (COLECTIVA, con 2 riesgos de ejemplo)."
+          }
+        },
+        {
+          "name": "Renovar póliza (IPC)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/4/renovar",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "4", "renovar"]
+            },
+            "description": "Renueva la póliza 4 (INDIVIDUAL, ACTIVA, dedicada a renovar): incrementa canon y prima según el IPC y deja estado RENOVADA."
+          }
+        },
+        {
+          "name": "Cancelar póliza (cascada)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/5/cancelar",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "5", "cancelar"]
+            },
+            "description": "Cancela la póliza 5 (COLECTIVA, ACTIVA, dedicada a cancelar) y en cascada todos sus riesgos activos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Riesgos",
+      "item": [
+        {
+          "name": "Agregar riesgo a póliza colectiva",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inmuebleDireccion\": \"Calle 50 # 10-20 Apto 405, Bogota\",\n  \"canonAsociado\": 1900000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/2/riesgos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "2", "riesgos"]
+            },
+            "description": "Agrega un riesgo a la póliza 2 (COLECTIVA). Solo las pólizas colectivas admiten agregar riesgos."
+          }
+        },
+        {
+          "name": "Cancelar riesgo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/riesgos/3/cancelar",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "riesgos", "3", "cancelar"]
+            },
+            "description": "Cancela el riesgo con id 3 (segundo riesgo de la póliza colectiva 2)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Core Mock",
+      "item": [
+        {
+          "name": "Registrar evento en el CORE (mock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evento\": \"ACTUALIZACION\",\n  \"polizaId\": 555\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/core-mock/evento",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "core-mock", "evento"]
+            },
+            "description": "Envía un evento al mock del CORE. Registra en logs el intento de envío."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Casos de error (validaciones)",
+      "item": [
+        {
+          "name": "Sin api-key (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas"]
+            },
+            "description": "Petición sin el header api-key. Debe responder 401 Unauthorized."
+          }
+        },
+        {
+          "name": "api-key inválida (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "api-key", "value": "clave-incorrecta" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas"]
+            },
+            "description": "Petición con api-key incorrecta. Debe responder 401 Unauthorized."
+          }
+        },
+        {
+          "name": "Renovar póliza cancelada (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/3/renovar",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "3", "renovar"]
+            },
+            "description": "Intenta renovar la póliza 3 (CANCELADA). Debe responder 409 por regla de negocio."
+          }
+        },
+        {
+          "name": "Agregar riesgo a póliza individual (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inmuebleDireccion\": \"Carrera 15 # 80-10\",\n  \"canonAsociado\": 1600000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/6/riesgos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "6", "riesgos"]
+            },
+            "description": "Intenta agregar un riesgo a la póliza 6 (INDIVIDUAL). Debe responder 409: solo colectivas admiten agregar riesgos."
+          }
+        },
+        {
+          "name": "Agregar riesgo con datos inválidos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inmuebleDireccion\": \"\",\n  \"canonAsociado\": -100\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/2/riesgos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "2", "riesgos"]
+            },
+            "description": "Intenta agregar un riesgo con dirección vacía y canon negativo. Debe responder 400 por validación de entrada."
+          }
+        },
+        {
+          "name": "Consultar póliza inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "api-key", "value": "{{apiKey}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/polizas/9999/riesgos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "polizas", "9999", "riesgos"]
+            },
+            "description": "Consulta riesgos de una póliza que no existe. Debe responder 404."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: gestion-polizas-ms
+  # Perfil activo por defecto: H2 en memoria (no requiere instalación ni credenciales).
+  # Para usar PostgreSQL, arrancar con: --spring.profiles.active=postgres
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:h2}
+
+server:
+  port: ${PORT:8080}
+  # Fuerza UTF-8 en las respuestas HTTP para que tildes y ñ se serialicen correctamente.
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /api/v1/actuator
+  endpoint:
+    health:
+      show-details: never
+
+# ─── Seguridad ────────────────────────────────────────────────────────────────
+# Valor de la api-key exigida en el header 'api-key'. Se resuelve por variable de entorno;
+# el default '123456' corresponde al requerimiento del ejercicio para pruebas en local.
+security:
+  api-key: ${API_KEY:123456}
+
+# ─── Parámetros de negocio ──────────────────────────────────────────────────────
+# IPC aplicado en la renovación (porcentaje). Configurable, nunca hardcodeado en el código.
+negocio:
+  ipc-porcentaje: ${IPC_PORCENTAJE:5.0}
+
+# ─── Documentación OpenAPI / Swagger ─────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.gestionpolizas: ${LOG_LEVEL_APP:INFO}

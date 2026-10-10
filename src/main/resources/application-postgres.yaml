@@ -1,0 +1,27 @@
+# ======================================================================================
+# Perfil PostgreSQL — persistencia productiva (opcional)
+# Activar con: --spring.profiles.active=postgres
+# Requiere una base PostgreSQL accesible y las tablas creadas con los scripts de db/.
+# Las credenciales se resuelven por variables de entorno (nunca se hardcodean).
+# ======================================================================================
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/gestion_polizas}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      connection-timeout: ${DB_POOL_CONN_TIMEOUT_MS:10000}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # 'validate' verifica que el esquema coincida con las entidades, sin modificarlo.
+      # El esquema se crea con db/schema.sql y los datos con db/data.sql (ejecutados aparte).
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
